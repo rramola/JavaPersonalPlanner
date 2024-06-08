@@ -13,12 +13,16 @@ public class Main {
         Scanner makeNewBillInput = new Scanner(System.in);
         Scanner newBillNameInput = new Scanner(System.in);
         Scanner newBillAmountInput = new Scanner(System.in);
-
+        //task scanners
+        Scanner makeNewTaskInput = new Scanner(System.in);
+        Scanner newTaskNameInput = new Scanner(System.in);
+        Scanner billCompletedBooleanInput = new Scanner(System.in);
         //Program loop boolean
         Boolean running = true;
 
         //Lists
         List<Bill> billList = new ArrayList<Bill>();
+        List<Task> taskList = new ArrayList<Task>();
 
         //Program start loop
         while(running) {
@@ -51,7 +55,26 @@ public class Main {
                         System.out.println("Invalid Selection");
                     }
                 }
-            } else if (featureSelection.toLowerCase().equals("q")){
+            } else if (featureSelection.toLowerCase().equals("t")){
+                //Task creation loop
+                boolean anotherTask = true;
+                while (anotherTask){
+                    System.out.print("Would you like to add a new task. [Y]es or [No]? ");
+                    String makeNewTask = makeNewTaskInput.nextLine();
+                    if (makeNewTask.toLowerCase().equals("y")){
+                        //Task creation input
+                        System.out.print("Enter a name for the task you would like to add > ");
+                        String newTaskName = newTaskNameInput.nextLine();
+                        Task newTask = new Task(newTaskName, false);
+                        taskList.add(newTask);
+                        System.out.println(taskList.size());
+                    } else if (makeNewTask.toLowerCase().equals("n")){
+                        anotherTask = false;
+                    }else {
+                        System.out.println("Invalid Selection");
+                    }
+                }
+            }else if (featureSelection.toLowerCase().equals("q")){
                 running = false;
             }else {
                 System.out.println("Invalid Selection");
