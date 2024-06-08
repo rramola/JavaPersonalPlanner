@@ -3,10 +3,16 @@ import java.util.Date;
 public class Bill {
     private String name;
     private Double amountDue;
-    private Date date;
-    public Bill(String name, Double amountDue, Date date)  {
+    public Bill(String name, Double amountDue)  {
         this.name = name;
         this.amountDue = amountDue;
-        this.date = date;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public Double getAmountDue(){
+        return amountDue;
     }
 }
