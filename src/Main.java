@@ -9,18 +9,16 @@ public class Main {
         //Intro scanners
         Scanner plannerSelectionInput = new Scanner(System.in);
 
-
         //bill scanners
         Scanner makeNewBillInput = new Scanner(System.in);
         Scanner newBillNameInput = new Scanner(System.in);
         Scanner newBillAmountInput = new Scanner(System.in);
 
-        //Booleans
+        //Program loop boolean
         Boolean running = true;
 
         //Lists
         List<Bill> billList = new ArrayList<Bill>();
-
 
         //Program start loop
         while(running) {
@@ -29,6 +27,7 @@ public class Main {
             String featureSelection = plannerSelectionInput.nextLine();
             //Check which feature is selected
             if (featureSelection.toLowerCase().equals("b")) {
+                //Bill loop boolean
                 Boolean anotherBill = true;
                 //Bill creation loop start
                 while (anotherBill) {
@@ -48,10 +47,14 @@ public class Main {
                         System.out.println(billList.size());
                     } else if (makeNewBill.toLowerCase().equals("n")) {
                         anotherBill = false;
+                    }else {
+                        System.out.println("Invalid Selection");
                     }
                 }
             } else if (featureSelection.toLowerCase().equals("q")){
                 running = false;
+            }else {
+                System.out.println("Invalid Selection");
             }
         }
     }
