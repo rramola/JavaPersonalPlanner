@@ -7,6 +7,7 @@ public class Main {
     public static void main(String[] args){
         //Scanners
         //Intro scanners
+        Scanner mainMenuSelectionInput = new Scanner(System.in);
         Scanner plannerSelectionInput = new Scanner(System.in);
 
         //bill scanners
@@ -17,21 +18,26 @@ public class Main {
         Scanner makeNewTaskInput = new Scanner(System.in);
         Scanner newTaskNameInput = new Scanner(System.in);
         Scanner billCompletedBooleanInput = new Scanner(System.in);
+        //event scanners
+        Scanner makeNewEventInput = new Scanner(System.in);
+        Scanner newEventNameInput = new Scanner(System.in);
+
         //Program loop boolean
         Boolean running = true;
 
         //Lists
         List<Bill> billList = new ArrayList<Bill>();
         List<Task> taskList = new ArrayList<Task>();
+        List<Event> eventList = new ArrayList<Event>();
 
         //Program start loop
         while(running) {
             //Feature Selection
-            System.out.print("What would you like to do. Make new [B]ill [T]ask [E]vent or [Q]uit > ");
-            String featureSelection = plannerSelectionInput.nextLine();
-            //Check which feature is selected
-            if (featureSelection.toLowerCase().equals("b")) {
-                //Bill loop boolean
+            System.out.print("Please select a menu option. [1]Bills, [2]Tasks, [3]Events, [4]Quit");
+            String mainMenuSelection = mainMenuSelectionInput.nextLine();
+
+            //Bills menu
+            if (mainMenuSelection.equals("1")){
                 Boolean anotherBill = true;
                 //Bill creation loop start
                 while (anotherBill) {
@@ -51,32 +57,60 @@ public class Main {
                         System.out.println(billList.size());
                     } else if (makeNewBill.toLowerCase().equals("n")) {
                         anotherBill = false;
-                    }else {
+                    } else {
                         System.out.println("Invalid Selection");
                     }
                 }
-            } else if (featureSelection.toLowerCase().equals("t")){
+
+                //Task menu
+            }else if (mainMenuSelection.equals("2")){
                 //Task creation loop
-                boolean anotherTask = true;
-                while (anotherTask){
-                    System.out.print("Would you like to add a new task. [Y]es or [No]? ");
-                    String makeNewTask = makeNewTaskInput.nextLine();
-                    if (makeNewTask.toLowerCase().equals("y")){
-                        //Task creation input
-                        System.out.print("Enter a name for the task you would like to add > ");
-                        String newTaskName = newTaskNameInput.nextLine();
-                        Task newTask = new Task(newTaskName, false);
-                        taskList.add(newTask);
-                        System.out.println(taskList.size());
-                    } else if (makeNewTask.toLowerCase().equals("n")){
-                        anotherTask = false;
+                    boolean anotherTask = true;
+                    while (anotherTask){
+                        System.out.print("Would you like to add a new task. [Y]es or [No]? ");
+                        String makeNewTask = makeNewTaskInput.nextLine();
+                        if (makeNewTask.toLowerCase().equals("y")){
+                            //Task creation input
+                            System.out.print("Enter a name for the task you would like to add > ");
+                            String newTaskName = newTaskNameInput.nextLine();
+                            //Task object creation
+                            Task newTask = new Task(newTaskName, false);
+                            //Add task to task list
+                            taskList.add(newTask);
+                            System.out.println(taskList.size());
+                        } else if (makeNewTask.toLowerCase().equals("n")){
+                            anotherTask = false;
+                        }else {
+                            System.out.println("Invalid Selection");
+                        }
+                    }
+
+                    //Events menu
+                }else if(mainMenuSelection.equals("3")){
+                //Events creation loop
+                boolean anotherEvent = true;
+                while (anotherEvent) {
+                    //Events creation input
+                    System.out.println("Would you like to add a new event. [Y]es or [N]o? ");
+                    String makeNewEvent = makeNewEventInput.nextLine();
+                    if (makeNewEvent.toLowerCase().equals("y")) {
+                        System.out.print("What is the name of the event you want to add? ");
+                        String newEventName = newEventNameInput.nextLine();
+                        //Event object creation
+                        Event newEvent = new Event(newEventName);
+                        //Add event to event list
+                        eventList.add(newEvent);
+                        System.out.println(eventList.size());
+                    } else if (makeNewEvent.toLowerCase().equals("n")) {
+                        anotherEvent = false;
                     }else {
                         System.out.println("Invalid Selection");
                     }
                 }
-            }else if (featureSelection.toLowerCase().equals("q")){
+
+            }else if (mainMenuSelection.equals("4")){
                 running = false;
-            }else {
+            }else{
                 System.out.println("Invalid Selection");
             }
         }
