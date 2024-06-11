@@ -8,7 +8,6 @@ public class Main {
         //Scanners
         //intro scanners
         Scanner mainMenuSelectionInput = new Scanner(System.in);
-        Scanner plannerSelectionInput = new Scanner(System.in);
         //bill scanners
         Scanner billMenuSelectionInput = new Scanner(System.in);
         Scanner makeNewBillInput = new Scanner(System.in);
@@ -20,21 +19,19 @@ public class Main {
         //task scanners
         Scanner makeNewTaskInput = new Scanner(System.in);
         Scanner newTaskNameInput = new Scanner(System.in);
-        Scanner billCompletedBooleanInput = new Scanner(System.in);
+        Scanner taskMenuSelectionInput = new Scanner(System.in);
+        Scanner taskNameInput = new Scanner(System.in);
+
         //event scanners
         Scanner makeNewEventInput = new Scanner(System.in);
         Scanner newEventNameInput = new Scanner(System.in);
-
         //Lists
         List<Bill> billList = new ArrayList<Bill>();
         List<Task> taskList = new ArrayList<Task>();
         List<Event> eventList = new ArrayList<Event>();
-
         //Program loop boolean
         Boolean running = true;
-
-
-        //Program start loop
+        //Program start
         while(running) {
             //Feature Selection
             System.out.print("Please select a menu option. [1]Bills, [2]Tasks, [3]Events, [4]Quit > ");
@@ -87,7 +84,6 @@ public class Main {
                                 System.out.println(bill.getName() + " " +  "Successfully Paid!");
                                 bill.setIsPaid(true);
                             }
-
                         }
                     }else if(billMenuSelection.equals("4")){
                         System.out.print("Which bill would you like to delete? ");
@@ -103,16 +99,14 @@ public class Main {
                         billsMenuRunning = false;
                     }
                 }
-
                 //Task menu
             }else if (mainMenuSelection.equals("2")){
                 //Task creation loop
-                    boolean anotherTask = true;
-                    while (anotherTask){
-                        System.out.print("Would you like to add a new task. [Y]es or [No]? ");
-                        String makeNewTask = makeNewTaskInput.nextLine();
-                        if (makeNewTask.toLowerCase().equals("y")){
-                            //Task creation input
+                    boolean taskMenu = true;
+                    while (taskMenu) {
+                        System.out.print("Please select a menu option > [1]Add task [2]View tasks [3]Mark task as complete [4]Delete task [5]Return to previous menu > ");
+                        String taskMenuSelection = taskMenuSelectionInput.nextLine();
+                        if (taskMenuSelection.equals("1")) {
                             System.out.print("Enter a name for the task you would like to add > ");
                             String newTaskName = newTaskNameInput.nextLine();
                             //Task object creation
@@ -120,13 +114,42 @@ public class Main {
                             //Add task to task list
                             taskList.add(newTask);
                             System.out.println(taskList.size());
-                        } else if (makeNewTask.toLowerCase().equals("n")){
-                            anotherTask = false;
-                        }else {
-                            System.out.println("Invalid Selection");
+
+                        } else if (taskMenuSelection.equals("2")) {
+                            for (var i = 0; i <taskList.size(); i++){
+                                var task = taskList.get(i);
+                                var status = "Incomplete";
+                                if (task.getTaskCompleted()){
+                                    status = "Completed";
+                                }
+                                System.out.println("Task:" + " " + task.getName() + " - " + "Status:" + " " + status);
+                            }
+
+                        } else if (taskMenuSelection.equals("3")) {
+                            System.out.print("Please enter the task you would like to mark complete > ");
+                            String taskName = taskNameInput.nextLine();
+                            for (var i = 0; i < taskList.size(); i++) {
+                                var task = taskList.get(i);
+                                if (task.getName().toLowerCase().equals(taskName.toLowerCase())) {
+                                    task.setTaskCompleted(true);
+                                    System.out.println("Task marked complete!");
+                                }
+                            }
+                        }else if(taskMenuSelection.equals("4")) {
+                            System.out.print("Please enter the name of the task you would like to delete > ");
+                            String taskName = taskNameInput.nextLine();
+                            for (var i = 0; i < taskList.size(); i++) {
+                                var task = taskList.get(i);
+                                if (task.getName().toLowerCase().equals(taskName.toLowerCase())) {
+                                    taskList.remove(task);
+                                    System.out.print("Task successfully deleted!");
+                                }
+                            }
+                        } else if (taskMenuSelection.equals("5")) {
+                            taskMenu = false;
+
                         }
                     }
-
                     //Events menu
                 }else if(mainMenuSelection.equals("3")){
                 //Events creation loop
@@ -149,7 +172,6 @@ public class Main {
                         System.out.println("Invalid Selection");
                     }
                 }
-
             }else if (mainMenuSelection.equals("4")){
                 running = false;
             }else{

@@ -15,4 +15,7 @@ public class Task {
         return taskCompleted;
     }
 
+    public void setTaskCompleted(Boolean taskCompleted) {
+        this.taskCompleted = taskCompleted;
+    }
 }
