@@ -1,173 +1,92 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 
 
 public class Main {
     public static void main(String[] args){
-        //Scanners
-        //intro scanners
-        Scanner mainMenuSelectionInput = new Scanner(System.in);
-        //bill scanners
-        Scanner billMenuSelectionInput = new Scanner(System.in);
-        Scanner makeNewBillInput = new Scanner(System.in);
-        Scanner newBillNameInput = new Scanner(System.in);
-        Scanner newBillAmountInput = new Scanner(System.in);
-        Scanner payBillInput = new Scanner(System.in);
-        Scanner deleteBillInput = new Scanner(System.in);
 
-        //task scanners
-        Scanner makeNewTaskInput = new Scanner(System.in);
-        Scanner newTaskNameInput = new Scanner(System.in);
-        Scanner taskMenuSelectionInput = new Scanner(System.in);
-        Scanner taskNameInput = new Scanner(System.in);
-
-        //event scanners
-        Scanner makeNewEventInput = new Scanner(System.in);
-        Scanner newEventNameInput = new Scanner(System.in);
-        //Lists
+        Scanner input = new Scanner(System.in);
         List<Bill> billList = new ArrayList<Bill>();
         List<Task> taskList = new ArrayList<Task>();
         List<Event> eventList = new ArrayList<Event>();
-        //Program loop boolean
+
         Boolean running = true;
-        //Program start
         while(running) {
-            //Feature Selection
             System.out.print("Please select a menu option. [1]Bills, [2]Tasks, [3]Events, [4]Quit > ");
-            String mainMenuSelection = mainMenuSelectionInput.nextLine();
+            String mainMenuSelection = input.nextLine();
+
             //Bills menu
             if (mainMenuSelection.equals("1")){
                 Boolean billsMenuRunning = true;
                 while (billsMenuRunning) {
                     System.out.print("Would you like to [1]Create, [2]View, [3]Pay, [4]Delete, or [5]Quit > ");
-                    String billMenuSelection = billMenuSelectionInput.nextLine();
+                    String billMenuSelection = input.nextLine();
                     if (billMenuSelection.equals("1")) {
-                        Boolean anotherBill = true;
-                        //Bill creation loop start
-                        while (anotherBill) {
-                            System.out.print("Would you like to make a new bill('Y' or 'N)? ");
-                            String makeNewBill = makeNewBillInput.nextLine();
-                            //Check if a new bill will be added
-                            if (makeNewBill.toLowerCase().equals("y")) {
-                                //Bill creation input
-                                System.out.print("Enter a name for the bill that is due > ");
-                                String newBillName = newBillNameInput.nextLine();
-                                System.out.print("Enter the amount due for this bill > ");
-                                Double newBillAmount = newBillAmountInput.nextDouble();
-                                //Bill object creation
-                                Bill newBill = new Bill(newBillName, newBillAmount, false);
-                                //Add bill to list
-                                billList.add(newBill);
-                                System.out.println(billList.size());
-                            } else if (makeNewBill.toLowerCase().equals("n")) {
-                                anotherBill = false;
-                            } else {
-                                System.out.println("Invalid Selection");
-                            }
-                        }
+                        Bill newBill = createBill();
+                        billList.add(newBill);
                     }else if(billMenuSelection.equals("2")){
-                        for (var i = 0; i < billList.size(); i++){
-                            var bill = billList.get(i);
-                            var paidStatus = "Paid";
-                            if (!bill.getIsPaid()) {
-                                paidStatus = "Unpaid";
-                            }
-                            System.out.println("Bill Name:" + " " + bill.getName() + "," + " " + "Amount Due:" + " " + bill.getAmountDue() + "," + " " + paidStatus);
-                        }
+                        viewBills(billList);
                     }else if(billMenuSelection.equals("3")){
                         System.out.print("Which bill would you like to pay? ");
-                        String payBillName = payBillInput.nextLine();
-                        for (var i = 0; i < billList.size(); i++){
-                            var bill = billList.get(i);
-                            if (bill.getName().toLowerCase().equals(payBillName)){
-                                System.out.println(bill.getName() + " " +  "Successfully Paid!");
-                                bill.setIsPaid(true);
-                            }
-                        }
+                        String payBillName = input.nextLine();
+                        payBills(billList, payBillName);
                     }else if(billMenuSelection.equals("4")){
                         System.out.print("Which bill would you like to delete? ");
-                        String deleteBillName = deleteBillInput.nextLine();
-                        for (var i = 0; i < billList.size(); i++) {
-                            var bill = billList.get(i);
-                            if (bill.getName().toLowerCase().equals(deleteBillName)){
-                                System.out.println(bill.getName() + " " + "Successfully Deleted!");
-                                billList.remove(bill);
-                            }
-                        }
+                        String deleteBillName = input.nextLine();
+                        deleteBills(billList, deleteBillName);
                     } else if (billMenuSelection.equals("5")) {
                         billsMenuRunning = false;
+                    }else{
+                        System.out.println(("Invalid Selection"));
                     }
                 }
+
                 //Task menu
             }else if (mainMenuSelection.equals("2")){
-                //Task creation loop
                     boolean taskMenu = true;
                     while (taskMenu) {
-                        System.out.print("Please select a menu option > [1]Add task [2]View tasks [3]Mark task as complete [4]Delete task [5]Return to previous menu > ");
-                        String taskMenuSelection = taskMenuSelectionInput.nextLine();
+                        System.out.print("Would you like to [1]Create, [2]View, [3]Complete, [4]Delete, [5]Quit > ");
+                        String taskMenuSelection = input.nextLine();
                         if (taskMenuSelection.equals("1")) {
-                            System.out.print("Enter a name for the task you would like to add > ");
-                            String newTaskName = newTaskNameInput.nextLine();
-                            //Task object creation
-                            Task newTask = new Task(newTaskName, false);
-                            //Add task to task list
+                            Task newTask = createTask();
                             taskList.add(newTask);
-                            System.out.println(taskList.size());
-
                         } else if (taskMenuSelection.equals("2")) {
-                            for (var i = 0; i <taskList.size(); i++){
-                                var task = taskList.get(i);
-                                var status = "Incomplete";
-                                if (task.getTaskCompleted()){
-                                    status = "Completed";
-                                }
-                                System.out.println("Task:" + " " + task.getName() + " - " + "Status:" + " " + status);
-                            }
+                            viewTasks(taskList);
 
                         } else if (taskMenuSelection.equals("3")) {
                             System.out.print("Please enter the task you would like to mark complete > ");
-                            String taskName = taskNameInput.nextLine();
-                            for (var i = 0; i < taskList.size(); i++) {
-                                var task = taskList.get(i);
-                                if (task.getName().toLowerCase().equals(taskName.toLowerCase())) {
-                                    task.setTaskCompleted(true);
-                                    System.out.println("Task marked complete!");
-                                }
-                            }
+                            String taskName = input.nextLine();
+                            completeTask(taskList, taskName);
                         }else if(taskMenuSelection.equals("4")) {
                             System.out.print("Please enter the name of the task you would like to delete > ");
-                            String taskName = taskNameInput.nextLine();
-                            for (var i = 0; i < taskList.size(); i++) {
-                                var task = taskList.get(i);
-                                if (task.getName().toLowerCase().equals(taskName.toLowerCase())) {
-                                    taskList.remove(task);
-                                    System.out.print("Task successfully deleted!");
-                                }
-                            }
+                            String taskName = input.nextLine();
+                            deleteTask(taskList, taskName);
                         } else if (taskMenuSelection.equals("5")) {
                             taskMenu = false;
-
+                        }else {
+                            System.out.println("Invalid Selection");
                         }
                     }
+
                     //Events menu
                 }else if(mainMenuSelection.equals("3")){
-                //Events creation loop
-                boolean anotherEvent = true;
-                while (anotherEvent) {
-                    //Events creation input
-                    System.out.println("Would you like to add a new event. [Y]es or [N]o? ");
-                    String makeNewEvent = makeNewEventInput.nextLine();
-                    if (makeNewEvent.toLowerCase().equals("y")) {
-                        System.out.print("What is the name of the event you want to add? ");
-                        String newEventName = newEventNameInput.nextLine();
-                        //Event object creation
-                        Event newEvent = new Event(newEventName);
-                        //Add event to event list
+                boolean eventMenu = true;
+                while (eventMenu) {
+                    System.out.println("Would you like to [1]Add, [2]View, [3]Modify, [4]Delete, [5]Quit > ");
+                    String eventMenuSelection = input.nextLine();
+                    if (eventMenuSelection.equals("1")) {
+                        Event newEvent = createEvent();
                         eventList.add(newEvent);
-                        System.out.println(eventList.size());
-                    } else if (makeNewEvent.toLowerCase().equals("n")) {
-                        anotherEvent = false;
+                    } else if (eventMenuSelection.equals("2")) {
+                        viewEvents(eventList);
+                    } else if (eventMenuSelection.equals("4")) {
+                        System.out.print("Please enter the name of the event you would like to delete");
+                        String eventName = input.nextLine();
+                        deleteEvent(eventList, eventName);
+                    } else if (eventMenuSelection.equals("5")) {
+                        eventMenu = false;
                     }else {
                         System.out.println("Invalid Selection");
                     }
@@ -176,6 +95,110 @@ public class Main {
                 running = false;
             }else{
                 System.out.println("Invalid Selection");
+            }
+        }
+    }
+
+    public static Bill createBill(){
+        Scanner input = new Scanner(System.in);
+        System.out.print("Enter a name for the bill > ");
+        String newBillName = input.nextLine();
+        System.out.print("Enter the amount due for this bill > ");
+        Double newBillAmount = input.nextDouble();
+        Bill newBill = new Bill(newBillName, newBillAmount, false);
+        return newBill;
+    }
+
+    public static void viewBills(List<Bill> billList){
+        for (var i = 0; i < billList.size(); i++){
+            var bill = billList.get(i);
+            var paidStatus = "Paid";
+            if (!bill.getIsPaid()) {
+                paidStatus = "Unpaid";
+            }
+            System.out.println("Bill Name:" + " " + bill.getName() + "," + " " + "Amount Due:" + " " + bill.getAmountDue() + "," + " " + paidStatus);
+        }
+    }
+
+    public static void payBills(List<Bill> billList, String payBillName){
+        for (var i = 0; i < billList.size(); i++){
+            var bill = billList.get(i);
+            if (bill.getName().toLowerCase().equals(payBillName)){
+                System.out.println(bill.getName() + " " +  "Successfully Paid!");
+                bill.setIsPaid(true);
+            }
+        }
+    }
+
+    public static void deleteBills(List<Bill> billList, String deleteBillName){
+        for (var i = 0; i < billList.size(); i++) {
+            var bill = billList.get(i);
+            if (bill.getName().toLowerCase().equals(deleteBillName)){
+                System.out.println(bill.getName() + " " + "Successfully Deleted!");
+                billList.remove(bill);
+            }
+        }
+    }
+
+    public static Task createTask(){
+        Scanner input = new Scanner(System.in);
+        System.out.print("Enter a name for the task you would like to add > ");
+        String newTaskName = input.nextLine();
+        Task newTask = new Task(newTaskName, false);
+        return newTask;
+    }
+
+    public static void viewTasks(List<Task> taskList){
+        for (var i = 0; i <taskList.size(); i++){
+            var task = taskList.get(i);
+            var status = "Incomplete";
+            if (task.getTaskCompleted()){
+                status = "Completed";
+            }
+            System.out.println("Task:" + " " + task.getName() + " - " + "Status:" + " " + status);
+        }
+    }
+
+    public static void completeTask(List<Task> taskList, String taskName){
+        for (var i = 0; i < taskList.size(); i++) {
+            var task = taskList.get(i);
+            if (task.getName().toLowerCase().equals(taskName.toLowerCase())) {
+                task.setTaskCompleted(true);
+                System.out.println("Task marked complete!");
+            }
+        }
+    }
+
+    public static void deleteTask(List<Task> taskList, String taskName){
+        for (var i = 0; i < taskList.size(); i++) {
+            var task = taskList.get(i);
+            if (task.getName().toLowerCase().equals(taskName.toLowerCase())) {
+                taskList.remove(task);
+                System.out.print("Task successfully deleted!");
+            }
+        }
+    }
+
+    public static Event createEvent(){
+        Scanner input = new Scanner(System.in);
+        System.out.print("What is the name of the event you want to add? ");
+        String newEventName = input.nextLine();
+        Event newEvent = new Event(newEventName);
+        return newEvent;
+    }
+
+    public static void viewEvents(List<Event> eventList){
+        for (var i = 0; i < eventList.size(); i++){
+            var event = eventList.get(i);
+            System.out.println("Task:" + event.getName());
+        }
+    }
+
+    public static void deleteEvent(List<Event> eventList, String eventName){
+        for(var i = 0; i < eventList.size(); i++){
+            var event = eventList.get(i);
+            if (event.getName().toLowerCase().equals(eventName.toLowerCase())){
+                eventList.remove(event);
             }
         }
     }
