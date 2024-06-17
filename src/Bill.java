@@ -1,21 +1,25 @@
 import java.util.Date;
 
 public class Bill {
-    private String name;
-    private Double amountDue;
+    private Integer userId;
+    private String title;
+    private Double amount;
+    private Date dueDate;
     private Boolean isPaid;
-    public Bill(String name, Double amountDue, boolean isPaid)  {
-        this.name = name;
-        this.amountDue = amountDue;
+    public Bill(Integer userId, String title, Double amount, Date dueDate, boolean isPaid)  {
+        this.userId = userId;
+        this.title = title;
+        this.amount = amount;
+        this.dueDate = dueDate;
         this.isPaid = isPaid;
     }
 
-    public String getName(){
-        return name;
+    public String getTitle(){
+        return title;
     }
 
-    public Double getAmountDue() {
-        return amountDue;
+    public Double getAmount() {
+        return amount;
     }
 
     public Boolean getIsPaid(){
