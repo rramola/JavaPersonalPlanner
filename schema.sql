@@ -14,7 +14,7 @@ CREATE TABLE bills (
     amount DECIMAL(10, 2) NOT NULL,
     dueDate DATE NOT NULL,
     isPaid BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Calendar events table
@@ -25,7 +25,7 @@ CREATE TABLE calendar_events (
     eventDescription TEXT,
     eventDate TIMESTAMP NOT NULL,
     eventLocation TEXT,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- To-do items table

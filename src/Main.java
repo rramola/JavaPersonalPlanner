@@ -1,3 +1,4 @@
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,6 +9,12 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        DbFunctions db =new DbFunctions();
+        Connection conn = db.connectToDb("personalOrganizer", "postgres", "admin");
+        db.createUsersTable(conn, "users");
+        db.createBillsTable(conn, "bills");
+
+
 
         Scanner input = new Scanner(System.in);
         List<Bill> billList = new ArrayList<Bill>();
@@ -15,6 +22,16 @@ public class Main {
         List<Event> eventList = new ArrayList<Event>();
 
         Boolean running = true;
+
+//        System.out.print("Please enter your first name. >");
+//        String firstName = input.nextLine();
+//        System.out.print("Please enter your last name. >");
+//        String lastName = input.nextLine();
+//        System.out.print("Please enter your email address. >");
+//        String email = input.nextLine();
+//        User newUser = new User(email, firstName, lastName);
+
+
         while (running) {
             System.out.print("Please select a menu option. [1]Bills, [2]Tasks, [3]Events, [4]Quit > ");
             String mainMenuSelection = input.nextLine();
@@ -119,7 +136,7 @@ public class Main {
             if (!bill.getIsPaid()) {
                 paidStatus = "Unpaid";
             }
-            System.out.println("Bill Name:" + " " + bill.getTitle() + "," + " " + "Amount Due:" + " " + bill.getAmount() + "," + " " + paidStatus);
+            System.out.println("Bill Name: " + bill.getTitle() + ", " + "Due Date: "  + bill.getDueDate() + ", " + "Amount Due: "  + bill.getAmount() + ", " + paidStatus);
         }
     }
 

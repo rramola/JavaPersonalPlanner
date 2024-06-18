@@ -14,6 +14,9 @@ public class Bill {
         this.isPaid = isPaid;
     }
 
+    public Integer getUserId(){
+        return userId;
+    }
     public String getTitle(){
         return title;
     }
@@ -24,6 +27,10 @@ public class Bill {
 
     public Boolean getIsPaid(){
         return isPaid;
+    }
+
+    public Date getDueDate(){
+        return dueDate;
     }
 
     public void setIsPaid(Boolean isPaid){
