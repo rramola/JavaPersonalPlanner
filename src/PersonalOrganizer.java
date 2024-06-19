@@ -114,15 +114,27 @@ public class PersonalOrganizer {
     }
 
     public static void checkAccount() {
-        Boolean confirmPassword = false;
+        Boolean loggedIn = false;
         Scanner input = new Scanner(System.in);
         System.out.print("Do you already have an account? [Y]es or [N]o > ");
         String userAccountCreation = input.nextLine();
         if (userAccountCreation.toLowerCase().equals("y")) {
-            System.out.print("Please enter your username > ");
-            String user = input.nextLine();
-            System.out.print("Please enter your password > ");
-            String password = input.nextLine();
+            while (!loggedIn) {
+                DbFunctions db = new DbFunctions();
+                Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
+                System.out.print("Please enter your username > ");
+                String user = input.nextLine();
+                System.out.print("Please enter your password > ");
+                String password = input.nextLine();
+                Integer currentUserId = DbFunctions.loginUser(conn, user, password);
+                if (currentUserId != null){
+                    loggedIn = true;
+                    System.out.println(currentUserId);
+                    run(currentUserId);
+                }else{
+                    System.out.print("Incorrect login information.");
+                }
+            }
         } else if (userAccountCreation.toLowerCase().equals("n")) {
             System.out.print("Please enter your email > ");
             String email = input.nextLine();
@@ -132,13 +144,13 @@ public class PersonalOrganizer {
             String lastName = input.nextLine();
             System.out.print("Please enter a username > ");
             String username = input.nextLine();
-            while (!confirmPassword) {
+            while (!loggedIn) {
                 System.out.print("Please enter a password > ");
                 String passwordOne = input.nextLine();
                 System.out.print("Please confirm password > ");
                 String passwordTwo = input.nextLine();
                 if (passwordOne.equals(passwordTwo)) {
-                    confirmPassword = true;
+                    loggedIn = true;
                     DbFunctions db = new DbFunctions();
                     Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
                     DbFunctions.createUser(conn, email, firstName, lastName, username, passwordOne);

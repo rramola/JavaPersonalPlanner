@@ -112,6 +112,21 @@ public class DbFunctions {
         }
     }
 
+    public static Integer loginUser(Connection conn, String username, String password){
+        String sql = "SELECT id FROM users WHERE username = ? AND password = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            ResultSet resultSet = pstmt.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("id");
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+
     public static Integer getUserId(Connection conn, String username) {
         String sql = "SELECT id FROM users WHERE username = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
