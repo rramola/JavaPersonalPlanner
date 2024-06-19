@@ -38,3 +38,8 @@ public class Bill {
     }
 
 }
+
+
+
+
+//"insert into bills(" + userId + "," + title + "," + amount + "," + dueDate + "," + isPaid + ")"
