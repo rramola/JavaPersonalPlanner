@@ -1,3 +1,5 @@
+import org.postgresql.replication.fluent.physical.PhysicalReplicationOptions;
+
 import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.Date;
@@ -18,6 +20,9 @@ public class DbFunctions {
         }
         return conn;
     }
+
+
+    ///////////////////TABLE METHODS/////////////////////
     public void createUsersTable(Connection conn, String tableName){
         Statement statement;
         try{
@@ -75,6 +80,7 @@ public class DbFunctions {
             System.out.println(e);
         }
     }
+
     public void createEventsTable(Connection conn, String tableName){
         Statement statement;
         try{
@@ -112,6 +118,22 @@ public class DbFunctions {
         }
     }
 
+
+    //////////////////////USER METHODS////////////////////
+    public static Boolean checkUsers(Connection conn, String email){
+        String sql = "SELECT id FROM users WHERE email = ?";
+        try(PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, email);
+            ResultSet resultSet = pstmt.executeQuery();
+            if(resultSet.next()){
+                return  true;
+            }
+        }catch (Exception e){
+            System.out.println(e);
+        }
+        return false;
+    }
+
     public static Integer loginUser(Connection conn, String username, String password){
         String sql = "SELECT id FROM users WHERE username = ? AND password = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -140,6 +162,9 @@ public class DbFunctions {
         }
         return null;
     }
+
+
+    ////////////////BILLS METHODS///////////////////
     public static void createBill(Connection conn, Integer userId, String title, Double amount, Date dueDate, Boolean isPaid ){
         String sql = "insert into bills(userId,title,amount,dueDate,isPaid) "
                 + "Values(?,?,?,?,?)";
@@ -153,6 +178,60 @@ public class DbFunctions {
             System.out.println("Bill Created Successfully");
         }catch (Exception e){
             System.out.println(e);
+        }
+    }
+
+    public static void viewBills(Connection conn, Integer userId){
+        String sql = "SELECT b.id, b.title, b.amount, b.dueDate, b.isPaid\n" +
+                "FROM bills b\n" +
+                "JOIN users u ON b.userId = u.id\n" +
+                "WHERE u.id = ?";
+        try(PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setInt(1, userId);
+            ResultSet resultSet = pstmt.executeQuery();
+            while (resultSet.next()) {
+                String status = "Paid";
+                if (!resultSet.getBoolean("isPaid")){
+                    status = "Unpaid";
+                }
+                String billInfo = "Bill ID: " + resultSet.getInt("id") +
+                        " NAME: " + resultSet.getString("title") +
+                        " AMOUNT DUE: " + resultSet.getInt("amount") +
+                        " DUE DATE: " + resultSet.getDate("dueDate") +
+                        " STATUS: " + status;
+                System.out.println(billInfo);
+            }
+        }catch (Exception e){
+            System.out.print(e);
+        }
+    }
+    public static void payBill(Connection conn, String payBillName, Integer userId){
+        String sql = "UPDATE bills b " +
+                "SET isPaid = ? " +
+                "WHERE b.title = ? " +
+                "AND b.userId = ?";
+        try(PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setBoolean(1,true);
+            pstmt.setString(2,payBillName);
+            pstmt.setInt(3,userId);
+            pstmt.executeUpdate();
+            System.out.println("Bill Paid Successfully");
+        }catch (Exception e){
+            System.out.print(e);
+        }
+    }
+
+    public static void deleteBill(Connection conn, String payBillName, Integer userId){
+        String sql = "DELETE FROM bills b " +
+                "WHERE b.title = ? " +
+                "AND b.userId = ?";
+        try(PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1,payBillName);
+            pstmt.setInt(2,userId);
+            pstmt.executeUpdate();
+            System.out.println("Bill Deleted Successfully");
+        }catch (Exception e){
+            System.out.print(e);
         }
     }
 }

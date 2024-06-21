@@ -41,15 +41,15 @@ public class PersonalOrganizer {
                     if (billMenuSelection.equals("1")) {
                         createBill(currentUserId);
                     } else if (billMenuSelection.equals("2")) {
-                        viewBills(billList);
+                        viewBills(currentUserId);
                     } else if (billMenuSelection.equals("3")) {
                         System.out.print("Which bill would you like to pay? ");
                         String payBillName = input.nextLine();
-                        payBills(billList, payBillName);
+                        payBills(payBillName, currentUserId);
                     } else if (billMenuSelection.equals("4")) {
                         System.out.print("Which bill would you like to delete? ");
                         String deleteBillName = input.nextLine();
-                        deleteBills(billList, deleteBillName);
+                        deleteBills(deleteBillName, currentUserId);
                     } else if (billMenuSelection.equals("5")) {
                         billsMenuRunning = false;
                     } else {
@@ -113,6 +113,8 @@ public class PersonalOrganizer {
         }
     }
 
+
+    //////////////////////////USER METHODS////////////////////////////
     public static void checkAccount() {
         Boolean loggedIn = false;
         Scanner input = new Scanner(System.in);
@@ -136,40 +138,45 @@ public class PersonalOrganizer {
                 }
             }
         } else if (userAccountCreation.toLowerCase().equals("n")) {
+            DbFunctions db = new DbFunctions();
+            Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
             System.out.print("Please enter your email > ");
             String email = input.nextLine();
-            System.out.print("Please enter your first name > ");
-            String firstName = input.nextLine();
-            System.out.print("Please enter your last name > ");
-            String lastName = input.nextLine();
-            System.out.print("Please enter a username > ");
-            String username = input.nextLine();
-            while (!loggedIn) {
-                System.out.print("Please enter a password > ");
-                String passwordOne = input.nextLine();
-                System.out.print("Please confirm password > ");
-                String passwordTwo = input.nextLine();
-                if (passwordOne.equals(passwordTwo)) {
-                    loggedIn = true;
-                    DbFunctions db = new DbFunctions();
-                    Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
-                    DbFunctions.createUser(conn, email, firstName, lastName, username, passwordOne);
-                    Integer currentUserId = DbFunctions.getUserId(conn, username);
-                    run(currentUserId);
-                } else {
+            Boolean isNewUser = DbFunctions.checkUsers(conn, email);
+            if (!isNewUser) {
+                System.out.print("Please enter your first name > ");
+                String firstName = input.nextLine();
+                System.out.print("Please enter your last name > ");
+                String lastName = input.nextLine();
+                System.out.print("Please enter a username > ");
+                String username = input.nextLine();
+                while (!loggedIn) {
+                    System.out.print("Please enter a password > ");
+                    String passwordOne = input.nextLine();
+                    System.out.print("Please confirm password > ");
+                    String passwordTwo = input.nextLine();
+                    if (passwordOne.equals(passwordTwo)) {
+                        loggedIn = true;
+                        DbFunctions.createUser(conn, email, firstName, lastName, username, passwordOne);
+                        Integer currentUserId = DbFunctions.getUserId(conn, username);
+                        run(currentUserId);
+                    }else {
                     System.out.println("Passwords do not match!");
+                    }
                 }
+            }else{
+                System.out.println("Account already exists for this email.");
+                checkAccount();
             }
         }else{
-            System.out.print("Invalid Selection");
+            System.out.println("Invalid Selection.");
+            checkAccount();
         }
     }
 
 
 
-
-
-
+    ////////////////////BILLS  METHODS////////////////////////////
     public static void createBill(Integer currentUserId) {
         DbFunctions db = new DbFunctions();
         Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
@@ -183,37 +190,26 @@ public class PersonalOrganizer {
         DbFunctions.createBill(conn, currentUserId, newBillName, newBillAmount, confirmDate, false);
     }
 
-    public static void viewBills(List<Bill> billList) {
-        for (var i = 0; i < billList.size(); i++) {
-            var bill = billList.get(i);
-            var paidStatus = "Paid";
-            if (!bill.getIsPaid()) {
-                paidStatus = "Unpaid";
-            }
-            System.out.println("Bill Name: " + bill.getTitle() + ", " + "Due Date: "  + bill.getDueDate() + ", " + "Amount Due: "  + bill.getAmount() + ", " + paidStatus);
-        }
+    public static void viewBills(Integer currentUserId) {
+        DbFunctions db = new DbFunctions();
+        Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
+        DbFunctions.viewBills(conn, currentUserId);
     }
 
-    public static void payBills(List<Bill> billList, String payBillName) {
-        for (var i = 0; i < billList.size(); i++) {
-            var bill = billList.get(i);
-            if (bill.getTitle().toLowerCase().equals(payBillName)) {
-                System.out.println(bill.getTitle() + " " + "Successfully Paid!");
-                bill.setIsPaid(true);
-            }
-        }
+    public static void payBills(String payBillName, Integer currentUserID) {
+        DbFunctions db = new DbFunctions();
+        Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
+        DbFunctions.payBill(conn, payBillName, currentUserID);
     }
 
-    public static void deleteBills(List<Bill> billList, String deleteBillName) {
-        for (var i = 0; i < billList.size(); i++) {
-            var bill = billList.get(i);
-            if (bill.getTitle().toLowerCase().equals(deleteBillName)) {
-                System.out.println(bill.getTitle() + " " + "Successfully Deleted!");
-                billList.remove(bill);
-            }
-        }
+    public static void deleteBills(String deleteBillName, Integer currentUserID) {
+        DbFunctions db = new DbFunctions();
+        Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
+        DbFunctions.deleteBill(conn, deleteBillName, currentUserID);
     }
 
+
+    /////////////////////TASKS METHODS/////////////////////
     public static Task createTask() {
         Scanner input = new Scanner(System.in);
         System.out.print("Enter a name for the task you would like to add > ");
@@ -299,9 +295,7 @@ public class PersonalOrganizer {
             }
         }
         return date;
-
     }
-
 }
 
 

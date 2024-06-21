@@ -1,0 +1,5 @@
+SELECT b.id, b.title, b.amount, b.dueDate, b.isPaid
+FROM bills b
+JOIN users u ON b.userId = u.id
+WHERE u.id = userId
+
