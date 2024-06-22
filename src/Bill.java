@@ -37,9 +37,16 @@ public class Bill {
         this.isPaid = isPaid;
     }
 
+    public String toString() {
+        String status = "Unpaid";
+        if (isPaid) {
+            status = "Paid";
+        } ;
+        return "NAME: " + title + ", AMOUNT DUE: " + amount +
+                ", DUE DATE: " + dueDate + ", STATUS: " + status;
+    }
 }
 
 
 
 
-//"insert into bills(" + userId + "," + title + "," + amount + "," + dueDate + "," + isPaid + ")"

@@ -1,23 +1,26 @@
 Query 1: Retrieve all bills for a specific user by id
-
 SELECT b.id, b.title, b.amount, b.dueDate, b.isPaid
 FROM bills b
 JOIN users u ON b.userId = u.id
 WHERE u.id = userId
 
-Query 2: Retrieve all upcoming calendar events for a specific user by id
 
-SELECT ce.id, ce.title, ce.eventDescription, ce.eventDate, ce.eventLocation
-FROM calendar_events ce
-JOIN users u ON ce.userId = u.id
-WHERE u.id = userId AND ce.eventDate > CURRENT_DATE;
+Query 2: Retrieve all  calendar events for a specific user by id
+SELECT e.id, e.title, e.eventDescription, e.eventDate, e.eventLocation
+FROM events e
+JOIN users u ON e.userId = u.id
+WHERE u.id = userId
+
 
 Query 3: Retrieve all to-do items for a specific user by id
-
-SELECT ti.id, ti.title, ti.todoDescription, ti.isCompleted
-FROM todo_items ti
-JOIN users u ON ti.userId = u.id
+SELECT t.id, t.title, t.todoDescription, t.isCompleted
+FROM tasks t
+JOIN users u ON t.userId = u.id
 WHERE u.id = userId
+
+
+
+
 
 Query 4: Retrieve all unpaid bills for a specific user by id
 

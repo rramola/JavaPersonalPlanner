@@ -1,18 +1,16 @@
 import java.sql.Connection;
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.Date;
-import java.util.List;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
-
 public class PersonalOrganizer {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         checkAccount();
     }
 
-    public static void run(Integer currentUserId) {
+    public static void run(Integer currentUserId) throws SQLException {
         DbFunctions db = new DbFunctions();
         Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
         db.createUsersTable(conn, "users");
@@ -21,9 +19,6 @@ public class PersonalOrganizer {
         db.createEventsTable(conn, "events");
 
         Scanner input = new Scanner(System.in);
-        List<Bill> billList = new ArrayList<Bill>();
-        List<Task> taskList = new ArrayList<Task>();
-        List<Event> eventList = new ArrayList<Event>();
 
         Boolean running = true;
 
@@ -109,64 +104,116 @@ public class PersonalOrganizer {
         }
     }
 
-
     //////////////////////////USER METHODS////////////////////////////
-    public static void checkAccount() {
+    public static void checkAccount() throws SQLException {
+        Boolean running = true;
         Boolean loggedIn = false;
-        Scanner input = new Scanner(System.in);
-        System.out.print("Do you already have an account? [Y]es or [N]o > ");
-        String userAccountCreation = input.nextLine();
-        if (userAccountCreation.toLowerCase().equals("y")) {
-            while (!loggedIn) {
-                DbFunctions db = new DbFunctions();
-                Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
-                System.out.print("Please enter your username > ");
-                String user = input.nextLine();
-                System.out.print("Please enter your password > ");
-                String password = input.nextLine();
-                Integer currentUserId = DbFunctions.loginUser(conn, user, password);
-                if (currentUserId != null){
-                    loggedIn = true;
-                    System.out.println(currentUserId);
-                    run(currentUserId);
-                }else{
-                    System.out.print("Incorrect login information.");
-                }
-            }
-        } else if (userAccountCreation.toLowerCase().equals("n")) {
-            DbFunctions db = new DbFunctions();
-            Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
-            System.out.print("Please enter your email > ");
-            String email = input.nextLine();
-            Boolean isNewUser = DbFunctions.checkUsers(conn, email);
-            if (!isNewUser) {
-                System.out.print("Please enter your first name > ");
-                String firstName = input.nextLine();
-                System.out.print("Please enter your last name > ");
-                String lastName = input.nextLine();
-                System.out.print("Please enter a username > ");
-                String username = input.nextLine();
+        while (running) {
+            Scanner input = new Scanner(System.in);
+            System.out.print("Do you already have an account? [Y]es or [N]o [Q]uit > ");
+            String userAccountCreation = input.nextLine();
+            if (userAccountCreation.toLowerCase().equals("y")) {
                 while (!loggedIn) {
-                    System.out.print("Please enter a password > ");
-                    String passwordOne = input.nextLine();
-                    System.out.print("Please confirm password > ");
-                    String passwordTwo = input.nextLine();
-                    if (passwordOne.equals(passwordTwo)) {
+                    DbFunctions db = new DbFunctions();
+                    Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
+                    System.out.print("Please enter your username > ");
+                    String username = input.nextLine();
+                    System.out.print("Please enter your password > ");
+                    String password = input.nextLine();
+                    Integer currentUserId = DbFunctions.loginUser(conn, username, password);
+                    if (currentUserId != null) {
                         loggedIn = true;
-                        DbFunctions.createUser(conn, email, firstName, lastName, username, passwordOne);
-                        Integer currentUserId = DbFunctions.getUserId(conn, username);
+                        System.out.println(currentUserId);
                         run(currentUserId);
-                    }else {
-                    System.out.println("Passwords do not match!");
+                    } else {
+                        System.out.print("Incorrect login information.");
                     }
                 }
-            }else{
-                System.out.println("Account already exists for this email.");
-                checkAccount();
+            } else if (userAccountCreation.toLowerCase().equals("n")) {
+                Boolean accountCreated = false;
+                DbFunctions db = new DbFunctions();
+                Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
+                while (!accountCreated) {
+                    Boolean addEmail = false;
+                    String email = "";
+                    while (!addEmail) {
+                        System.out.print("Please enter your email > ");
+                        email = input.nextLine();
+                        if (email.isEmpty()) {
+                            System.out.println("Invalid entry.");
+                        } else {
+                            Boolean isNewUser = DbFunctions.checkNewUserEmail(conn, email);
+                            if (isNewUser) {
+                                System.out.println("Account already exists for this email.");
+                            } else {
+                                addEmail = true;
+                            }
+                        }
+                    }
+
+                    Boolean addFirstName = false;
+                    String firstName = "";
+                    while (!addFirstName) {
+                        System.out.print("Please enter your first name > ");
+                        firstName = input.nextLine();
+                        if (firstName.isEmpty()) {
+                            System.out.println("Invalid entry.");
+                        } else {
+                            addFirstName = true;
+                        }
+                    }
+
+                    Boolean addLastName = false;
+                    String lastName = "";
+                    while (!addLastName) {
+                        System.out.print("Please enter your last name > ");
+                        lastName = input.nextLine();
+                        if (lastName.isEmpty()) {
+                            System.out.println("Invalid entry.");
+                        } else {
+                            addLastName = true;
+                        }
+                    }
+
+                    Boolean createUsername = false;
+                    String username = "";
+                    while (!createUsername) {
+                        System.out.print("Please enter a username > ");
+                        username = input.nextLine();
+                        if (username.isEmpty()) {
+                            System.out.println("Invalid entry");
+                        } else {
+
+                            Boolean checkUsername = DbFunctions.checkNewUsername(conn, username);
+                            if (checkUsername) {
+                                System.out.println("Username already taken.");
+                            } else {
+                                createUsername = true;
+                            }
+                        }
+                    }
+
+                    while (!loggedIn) {
+                        System.out.print("Please enter a password > ");
+                        String passwordOne = input.nextLine();
+                        System.out.print("Please confirm password > ");
+                        String passwordTwo = input.nextLine();
+                        if (passwordOne.equals(passwordTwo)) {
+                            loggedIn = true;
+                            DbFunctions.createUser(conn, email, firstName, lastName, username, passwordOne);
+                            Integer currentUserId = DbFunctions.getUserId(conn, username);
+                            accountCreated = true;
+                            run(currentUserId);
+                        } else {
+                            System.out.println("Passwords do not match!");
+                        }
+                    }
+                }
+            } else if (userAccountCreation.toLowerCase().equals("q")) {
+                running = false;
+            } else {
+                System.out.println("Invalid Selection.");
             }
-        }else{
-            System.out.println("Invalid Selection.");
-            checkAccount();
         }
     }
 
@@ -184,10 +231,14 @@ public class PersonalOrganizer {
         DbFunctions.createBill(conn, currentUserId, newBillName, newBillAmount, confirmDate, false);
     }
 
-    public static void viewBills(Integer currentUserId) {
+    public static void viewBills(Integer currentUserId) throws SQLException {
         DbFunctions db = new DbFunctions();
         Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
-        DbFunctions.viewBills(conn, currentUserId);
+        var bills = DbFunctions.viewBills(conn, currentUserId);
+        for (var i = 0; i < bills.size(); i++) {
+           var bill = bills.get(i);
+           System.out.println(bill.toString());
+        }
     }
 
     public static void payBills(String payBillName, Integer currentUserID) {
@@ -201,7 +252,6 @@ public class PersonalOrganizer {
         Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
         DbFunctions.deleteBill(conn, deleteBillName, currentUserID);
     }
-
 
     /////////////////////TASKS METHODS/////////////////////
     public static void createTask(Integer currentUserId) {
@@ -233,7 +283,6 @@ public class PersonalOrganizer {
         Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
         DbFunctions.deleteTask(conn, taskName, currentUserId);
     }
-
 
     /////////////////////EVENT METHODS///////////////////////
     public static void createEvent(Integer currentUserId) {
@@ -271,7 +320,6 @@ public class PersonalOrganizer {
             String newBillDueDate = input.nextLine();
             try {
                 date = dateFormat.parse(newBillDueDate);
-
             } catch (ParseException e) {
                 System.out.println("Invalid date format. Please enter the date in the format yyyy-MM-dd.");
             }

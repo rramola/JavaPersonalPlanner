@@ -1,8 +1,10 @@
 import org.postgresql.replication.fluent.physical.PhysicalReplicationOptions;
 
 import javax.swing.plaf.nimbus.State;
+import javax.xml.transform.Result;
 import java.net.ConnectException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
@@ -22,7 +24,6 @@ public class DbFunctions {
         }
         return conn;
     }
-
 
     ///////////////////TABLE METHODS/////////////////////
     public void createUsersTable(Connection conn, String tableName){
@@ -120,9 +121,8 @@ public class DbFunctions {
         }
     }
 
-
     //////////////////////USER METHODS////////////////////
-    public static Boolean checkUsers(Connection conn, String email){
+    public static Boolean checkNewUserEmail(Connection conn, String email){
         String sql = "SELECT id FROM users WHERE email = ?";
         try(PreparedStatement pstmt = conn.prepareStatement(sql)){
             pstmt.setString(1, email);
@@ -132,6 +132,20 @@ public class DbFunctions {
             }
         }catch (Exception e){
             System.out.println(e);
+        }
+        return false;
+    }
+
+    public static Boolean checkNewUsername(Connection conn, String username){
+        String sql = "SELECT id FROM users WHERE username = ?";
+        try(PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, username);
+            ResultSet resultSet = pstmt.executeQuery();
+            if(resultSet.next()){
+                return true;
+            }
+        }catch (Exception e){
+            System.out.print(e);
         }
         return false;
     }
@@ -165,7 +179,6 @@ public class DbFunctions {
         return null;
     }
 
-
     ////////////////BILLS METHODS///////////////////
     public static void createBill(Connection conn, Integer userId, String title, Double amount, Date dueDate, Boolean isPaid ){
         String sql = "insert into bills(userId,title,amount,dueDate,isPaid) "
@@ -183,7 +196,8 @@ public class DbFunctions {
         }
     }
 
-    public static void viewBills(Connection conn, Integer userId){
+    public static ArrayList<Bill> viewBills(Connection conn, Integer userId){
+        ArrayList<Bill> bills = new ArrayList<>();
         String sql = "SELECT b.id, b.title, b.amount, b.dueDate, b.isPaid\n" +
                 "FROM bills b\n" +
                 "JOIN users u ON b.userId = u.id\n" +
@@ -192,20 +206,17 @@ public class DbFunctions {
             pstmt.setInt(1, userId);
             ResultSet resultSet = pstmt.executeQuery();
             while (resultSet.next()) {
-                String status = "Paid";
-                if (!resultSet.getBoolean("isPaid")){
-                    status = "Unpaid";
-                }
-                String billInfo = "Bill ID: " + resultSet.getInt("id") +
-                        " NAME: " + resultSet.getString("title") +
-                        " AMOUNT DUE: " + resultSet.getInt("amount") +
-                        " DUE DATE: " + resultSet.getDate("dueDate") +
-                        " STATUS: " + status;
-                System.out.println(billInfo);
+                Integer id = resultSet.getInt("id");
+                String title = resultSet.getString("title");
+                Double amount = resultSet.getDouble("amount");
+                Date dueDate = resultSet.getDate("dueDate");
+                Boolean isPaid = resultSet.getBoolean("isPaid");
+                bills.add( new Bill(id, title, amount, dueDate, isPaid));
             }
         }catch (Exception e){
             System.out.print(e);
         }
+        return bills;
     }
     public static void payBill(Connection conn, String payBillName, Integer userId){
         String sql = "UPDATE bills b " +
@@ -256,7 +267,7 @@ public class DbFunctions {
         String sql = "SELECT t.id, t.title, t.todoDescription, t.dueDate, t.isCompleted\n" +
                 "FROM tasks t\n" +
                 "JOIN users u ON t.userId = u.id\n" +
-                "WHERE t.userId = ?";
+                "WHERE u.id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             ResultSet resultSet = pstmt.executeQuery();
@@ -327,7 +338,7 @@ public class DbFunctions {
         String sql = "SELECT e.id, e.title, e.eventDescription, e.eventDate, e.eventLocation\n" +
                 "FROM events e\n" +
                 "JOIN users u ON e.userId = u.id\n" +
-                "WHERE e.userId = ?";
+                "WHERE u.id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             ResultSet resultSet = pstmt.executeQuery();
