@@ -1,8 +1,10 @@
 import org.postgresql.replication.fluent.physical.PhysicalReplicationOptions;
 
 import javax.swing.plaf.nimbus.State;
+import java.net.ConnectException;
 import java.sql.*;
 import java.util.Date;
+import java.util.concurrent.TimeoutException;
 
 public class DbFunctions {
     public Connection connectToDb(String dbname, String user, String pass){
@@ -89,7 +91,7 @@ public class DbFunctions {
                     "    userId INTEGER NOT NULL,\n" +
                     "    title TEXT NOT NULL,\n" +
                     "    eventDescription TEXT,\n" +
-                    "    eventDate TIMESTAMP NOT NULL,\n" +
+                    "    eventDate DATE NOT NULL,\n" +
                     "    eventLocation TEXT,\n" +
                     "    FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE\n" +
                     ");";
@@ -230,6 +232,127 @@ public class DbFunctions {
             pstmt.setInt(2,userId);
             pstmt.executeUpdate();
             System.out.println("Bill Deleted Successfully");
+        }catch (Exception e){
+            System.out.print(e);
+        }
+    }
+    public static void createTask(Connection conn, Integer userId, String title, String description, Date date, Boolean isCompleted) {
+        String sql = "insert into tasks(userId,title,todoDescription, dueDate,isCompleted) "
+                + "VALUES(?,?,?,?,?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            pstmt.setString(2, title);
+            pstmt.setString(3, description);
+            pstmt.setObject(4, date, java.sql.Types.DATE);
+            pstmt.setBoolean(5, isCompleted);
+            pstmt.executeUpdate();
+            System.out.println("Task Created Successfully");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public static void viewTasks(Connection conn, Integer userId) {
+        String sql = "SELECT t.id, t.title, t.todoDescription, t.dueDate, t.isCompleted\n" +
+                "FROM tasks t\n" +
+                "JOIN users u ON t.userId = u.id\n" +
+                "WHERE t.userId = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            ResultSet resultSet = pstmt.executeQuery();
+            while (resultSet.next()) {
+                String status = "Completed";
+                if (!resultSet.getBoolean("isCompleted")) {
+                    status = "Not Completed";
+                }
+                String taskInfo = "TASK ID: " + resultSet.getInt("id") +
+                        " NAME: " + resultSet.getString("title") +
+                        " DESCRIPTION: " + resultSet.getString("todoDescription") +
+                        " DUE DATE: " + resultSet.getDate("dueDate") +
+                        " STATUS: " + status;
+                System.out.println(taskInfo);
+            }
+        } catch (Exception e) {
+            System.out.print(e);
+        }
+    }
+
+    public static void completeTask(Connection conn, Integer userId, String taskNAme) {
+        String sql = "UPDATE tasks t " +
+                "SET isCompleted = ? " +
+                "WHERE t.title = ? " +
+                "AND t.userId = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setBoolean(1, true);
+            pstmt.setString(2, taskNAme);
+            pstmt.setInt(3, userId);
+            pstmt.executeUpdate();
+            System.out.println("Task Completed");
+        } catch (Exception e) {
+            System.out.print(e);
+        }
+    }
+
+    public static void deleteTask(Connection conn, String taskName, Integer userId){
+        String sql = "DELETE FROM tasks t " +
+                "WHERE t.title = ? " +
+                "AND t.userId = ?";
+        try(PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1,taskName);
+            pstmt.setInt(2,userId);
+            pstmt.executeUpdate();
+            System.out.println("Task Deleted Successfully");
+        }catch (Exception e){
+            System.out.print(e);
+        }
+    }
+
+    public static void createEvent(Connection conn, Integer userId, String title, String eventDescription, Date eventDate, String eventLocation) {
+        String sql = "insert into events(userId,title,eventDescription, eventDate, eventLocation) "
+                + "VALUES(?,?,?,?,?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            pstmt.setString(2, title);
+            pstmt.setString(3, eventDescription);
+            pstmt.setObject(4, eventDate, java.sql.Types.DATE);
+            pstmt.setString(5, eventLocation);
+            pstmt.executeUpdate();
+            System.out.println("Event Created Successfully");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public static void viewEvents(Connection conn, Integer userId) {
+        String sql = "SELECT e.id, e.title, e.eventDescription, e.eventDate, e.eventLocation\n" +
+                "FROM events e\n" +
+                "JOIN users u ON e.userId = u.id\n" +
+                "WHERE e.userId = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            ResultSet resultSet = pstmt.executeQuery();
+            while (resultSet.next()) {
+                String taskInfo = "EVENT ID: " + resultSet.getInt("id") +
+                        " NAME: " + resultSet.getString("title") +
+                        " DESCRIPTION: " + resultSet.getString("eventDescription") +
+                        " EVENT DATE: " + resultSet.getDate("eventDate") +
+                        " EVENT LOCATION: " + resultSet.getString("eventLocation") ;
+                System.out.println(taskInfo);
+            }
+        } catch (Exception e) {
+            System.out.print(e);
+        }
+    }
+
+    public static void deleteEvent(Connection conn, String eventName, Integer userId){
+        String sql = "DELETE FROM events e " +
+                "WHERE e.title = ? " +
+                "AND e.userId = ?";
+        try(PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1,eventName);
+            pstmt.setInt(2,userId);
+            pstmt.executeUpdate();
+            System.out.println("Event Deleted Successfully");
         }catch (Exception e){
             System.out.print(e);
         }

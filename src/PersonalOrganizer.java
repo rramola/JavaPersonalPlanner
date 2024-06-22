@@ -1,5 +1,4 @@
 import java.sql.Connection;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -64,19 +63,17 @@ public class PersonalOrganizer {
                     System.out.print("Would you like to [1]Create, [2]View, [3]Complete, [4]Delete, [5]Quit > ");
                     String taskMenuSelection = input.nextLine();
                     if (taskMenuSelection.equals("1")) {
-                        Task newTask = createTask();
-                        taskList.add(newTask);
+                        createTask(currentUserId);
                     } else if (taskMenuSelection.equals("2")) {
-                        viewTasks(taskList);
-
+                        viewTasks(currentUserId);
                     } else if (taskMenuSelection.equals("3")) {
                         System.out.print("Please enter the task you would like to mark complete > ");
                         String taskName = input.nextLine();
-                        completeTask(taskList, taskName);
+                        completeTask(currentUserId, taskName);
                     } else if (taskMenuSelection.equals("4")) {
                         System.out.print("Please enter the name of the task you would like to delete > ");
                         String taskName = input.nextLine();
-                        deleteTask(taskList, taskName);
+                        deleteTask(currentUserId, taskName);
                     } else if (taskMenuSelection.equals("5")) {
                         taskMenu = false;
                     } else {
@@ -88,18 +85,17 @@ public class PersonalOrganizer {
             } else if (mainMenuSelection.equals("3")) {
                 boolean eventMenu = true;
                 while (eventMenu) {
-                    System.out.println("Would you like to [1]Add, [2]View, [3]Modify, [4]Delete, [5]Quit > ");
+                    System.out.println("Would you like to [1]Add, [2]View,[3]Delete, [4]Quit > ");
                     String eventMenuSelection = input.nextLine();
                     if (eventMenuSelection.equals("1")) {
-                        Event newEvent = createEvent();
-                        eventList.add(newEvent);
+                        createEvent(currentUserId);
                     } else if (eventMenuSelection.equals("2")) {
-                        viewEvents(eventList);
-                    } else if (eventMenuSelection.equals("4")) {
-                        System.out.print("Please enter the name of the event you would like to delete");
+                        viewEvents(currentUserId);
+                    } else if (eventMenuSelection.equals("3")) {
+                        System.out.print("Please enter the name of the event you would like to delete > ");
                         String eventName = input.nextLine();
-                        deleteEvent(eventList, eventName);
-                    } else if (eventMenuSelection.equals("5")) {
+                        deleteEvent(currentUserId, eventName);
+                    } else if (eventMenuSelection.equals("4")) {
                         eventMenu = false;
                     } else {
                         System.out.println("Invalid Selection");
@@ -174,8 +170,6 @@ public class PersonalOrganizer {
         }
     }
 
-
-
     ////////////////////BILLS  METHODS////////////////////////////
     public static void createBill(Integer currentUserId) {
         DbFunctions db = new DbFunctions();
@@ -210,48 +204,41 @@ public class PersonalOrganizer {
 
 
     /////////////////////TASKS METHODS/////////////////////
-    public static Task createTask() {
+    public static void createTask(Integer currentUserId) {
+        DbFunctions db = new DbFunctions();
+        Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
         Scanner input = new Scanner(System.in);
         System.out.print("Enter a name for the task you would like to add > ");
         String newTaskName = input.nextLine();
         System.out.print("Enter a description for the task you would like to add > ");
         String newTaskDescription = input.nextLine();
-        Date confirmDate = dateCheck("Enter the new bill due date (yyyy-MM-dd) >");
-        return new Task(1, newTaskName, newTaskDescription, confirmDate, false);
+        Date confirmDate = dateCheck("Enter the date the task is due (yyyy-MM-dd) >");
+        DbFunctions.createTask(conn, currentUserId, newTaskName, newTaskDescription, confirmDate, false);
     }
 
-    public static void viewTasks(List<Task> taskList) {
-        for (var i = 0; i < taskList.size(); i++) {
-            var task = taskList.get(i);
-            var status = "Incomplete";
-            if (task.getIsCompleted()) {
-                status = "Completed";
-            }
-            System.out.println("Task:" + " " + task.getTitle() + " - " + "Status:" + " " + status);
-        }
+    public static void viewTasks(Integer currentUserId) {
+        DbFunctions db = new DbFunctions();
+        Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
+        DbFunctions.viewTasks(conn, currentUserId);
     }
 
-    public static void completeTask(List<Task> taskList, String taskName) {
-        for (var i = 0; i < taskList.size(); i++) {
-            var task = taskList.get(i);
-            if (task.getTitle().toLowerCase().equals(taskName.toLowerCase())) {
-                task.setIsCompleted(true);
-                System.out.println("Task marked complete!");
-            }
-        }
+    public static void completeTask(Integer currentUserId, String taskName) {
+        DbFunctions db = new DbFunctions();
+        Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
+        DbFunctions.completeTask(conn, currentUserId, taskName);
     }
 
-    public static void deleteTask(List<Task> taskList, String taskName) {
-        for (var i = 0; i < taskList.size(); i++) {
-            var task = taskList.get(i);
-            if (task.getTitle().toLowerCase().equals(taskName.toLowerCase())) {
-                taskList.remove(task);
-                System.out.print("Task successfully deleted!");
-            }
-        }
+    public static void deleteTask(Integer currentUserId, String taskName) {
+        DbFunctions db = new DbFunctions();
+        Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
+        DbFunctions.deleteTask(conn, taskName, currentUserId);
     }
 
-    public static Event createEvent() {
+
+    /////////////////////EVENT METHODS///////////////////////
+    public static void createEvent(Integer currentUserId) {
+        DbFunctions db = new DbFunctions();
+        Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
         Scanner input = new Scanner(System.in);
         System.out.print("What is the name of the event you want to add? ");
         String newEventName = input.nextLine();
@@ -260,24 +247,19 @@ public class PersonalOrganizer {
         Date confirmDate = dateCheck("Enter the new bill due date (yyyy-MM-dd) >");
         System.out.print("Please enter a location for this event.> ");
         String newEventLocation = input.nextLine();
-        Event newEvent = new Event(1,newEventName, newEventDescription, (Timestamp) confirmDate, newEventLocation);
-        return newEvent;
+        DbFunctions.createEvent(conn, currentUserId,newEventName, newEventDescription, confirmDate, newEventLocation);
     }
 
-    public static void viewEvents(List<Event> eventList) {
-        for (var i = 0; i < eventList.size(); i++) {
-            var event = eventList.get(i);
-            System.out.println("Task:" + event.getTitle());
-        }
+    public static void viewEvents(Integer currentUserId) {
+        DbFunctions db = new DbFunctions();
+        Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
+        DbFunctions.viewEvents(conn, currentUserId);
     }
 
-    public static void deleteEvent(List<Event> eventList, String eventName) {
-        for (var i = 0; i < eventList.size(); i++) {
-            var event = eventList.get(i);
-            if (event.getTitle().toLowerCase().equals(eventName.toLowerCase())) {
-                eventList.remove(event);
-            }
-        }
+    public static void deleteEvent(Integer currentUserId, String eventName) {
+        DbFunctions db = new DbFunctions();
+        Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
+        DbFunctions.deleteEvent(conn, eventName, currentUserId);
     }
 
     public static Date dateCheck(String prompt) {
