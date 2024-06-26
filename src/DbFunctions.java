@@ -1,3 +1,4 @@
+import org.postgresql.jdbc2.ArrayAssistant;
 import org.postgresql.replication.fluent.physical.PhysicalReplicationOptions;
 
 import javax.swing.plaf.nimbus.State;
@@ -205,6 +206,9 @@ public class DbFunctions {
         try(PreparedStatement pstmt = conn.prepareStatement(sql)){
             pstmt.setInt(1, userId);
             ResultSet resultSet = pstmt.executeQuery();
+            if (!resultSet.isBeforeFirst() ) {
+                System.out.println("No bills found.");
+            }
             while (resultSet.next()) {
                 Integer id = resultSet.getInt("id");
                 String title = resultSet.getString("title");
@@ -218,6 +222,62 @@ public class DbFunctions {
         }
         return bills;
     }
+
+    public static ArrayList<Bill> viewPaidBills(Connection conn, Integer userId){
+        ArrayList<Bill> bills = new ArrayList<>();
+        String sql = "SELECT b.id, b.title, b.amount, b.dueDate, b.isPaid\n" +
+                "FROM bills b\n" +
+                "JOIN users u ON b.userId = u.id\n" +
+                "WHERE u.id = ?\n" +
+                "AND isPaid";
+        try(PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setInt(1, userId);
+            ResultSet resultSet = pstmt.executeQuery();
+            if (!resultSet.isBeforeFirst() ) {
+                System.out.println("No bills found.");
+            }
+            while (resultSet.next()) {
+                Integer id = resultSet.getInt("id");
+                String title = resultSet.getString("title");
+                Double amount = resultSet.getDouble("amount");
+                Date dueDate = resultSet.getDate("dueDate");
+                Boolean isPaid = resultSet.getBoolean("isPaid");
+                bills.add( new Bill(id, title, amount, dueDate, isPaid));
+            }
+        }catch (Exception e){
+            System.out.print(e);
+        }
+        return bills;
+    }
+
+    public static ArrayList<Bill> viewUnpaidBills(Connection conn, Integer userId){
+        ArrayList<Bill> bills = new ArrayList<>();
+        String sql = "SELECT b.id, b.title, b.amount, b.dueDate, b.isPaid\n" +
+                "FROM bills b\n" +
+                "JOIN users u ON b.userId = u.id\n" +
+                "WHERE u.id = ?\n" +
+                "AND NOT isPaid";
+        try(PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setInt(1, userId);
+            ResultSet resultSet = pstmt.executeQuery();
+            if (!resultSet.isBeforeFirst() ) {
+                System.out.println("No bills found.");
+            }
+            while (resultSet.next()) {
+                Integer id = resultSet.getInt("id");
+                String title = resultSet.getString("title");
+                Double amount = resultSet.getDouble("amount");
+                Date dueDate = resultSet.getDate("dueDate");
+                Boolean isPaid = resultSet.getBoolean("isPaid");
+                bills.add( new Bill(id, title, amount, dueDate, isPaid));
+            }
+        }catch (Exception e){
+            System.out.print(e);
+        }
+        return bills;
+    }
+
+
     public static void payBill(Connection conn, String payBillName, Integer userId){
         String sql = "UPDATE bills b " +
                 "SET isPaid = ? " +
@@ -247,6 +307,20 @@ public class DbFunctions {
             System.out.print(e);
         }
     }
+
+    public static boolean checkBill(Connection conn, String billName){
+        String sql = "SELECT id FROM bills where title = ?";
+        try(PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, billName);
+            ResultSet resultSet = pstmt.executeQuery();
+            if(resultSet.next()){
+                return true;
+            }
+        }catch (Exception e){
+            System.out.print(e);
+        }
+        return false;
+    }
     public static void createTask(Connection conn, Integer userId, String title, String description, Date date, Boolean isCompleted) {
         String sql = "insert into tasks(userId,title,todoDescription, dueDate,isCompleted) "
                 + "VALUES(?,?,?,?,?)";
@@ -263,7 +337,8 @@ public class DbFunctions {
         }
     }
 
-    public static void viewTasks(Connection conn, Integer userId) {
+    public static ArrayList<Task> viewTasks(Connection conn, Integer userId) {
+        ArrayList<Task> tasks = new ArrayList<>();
         String sql = "SELECT t.id, t.title, t.todoDescription, t.dueDate, t.isCompleted\n" +
                 "FROM tasks t\n" +
                 "JOIN users u ON t.userId = u.id\n" +
@@ -271,21 +346,75 @@ public class DbFunctions {
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             ResultSet resultSet = pstmt.executeQuery();
+            if (!resultSet.isBeforeFirst() ) {
+                System.out.println("No tasks found.");
+            }
             while (resultSet.next()) {
-                String status = "Completed";
-                if (!resultSet.getBoolean("isCompleted")) {
-                    status = "Not Completed";
-                }
-                String taskInfo = "TASK ID: " + resultSet.getInt("id") +
-                        " NAME: " + resultSet.getString("title") +
-                        " DESCRIPTION: " + resultSet.getString("todoDescription") +
-                        " DUE DATE: " + resultSet.getDate("dueDate") +
-                        " STATUS: " + status;
-                System.out.println(taskInfo);
+                Integer id = resultSet.getInt("id");
+                String title = resultSet.getString("title");
+                String description = resultSet.getString("todoDescription");
+                Date date = resultSet.getDate("dueDate");
+                Boolean isCompleted = resultSet.getBoolean("isCompleted");
+                tasks.add( new Task(id,title,description,date,isCompleted));
             }
         } catch (Exception e) {
             System.out.print(e);
         }
+        return tasks;
+    }
+
+    public static ArrayList<Task> viewCompleteTasks(Connection conn, Integer userId) {
+        ArrayList<Task> tasks = new ArrayList<>();
+        String sql = "SELECT t.id, t.title, t.todoDescription, t.dueDate, t.isCompleted\n" +
+                "FROM tasks t\n" +
+                "JOIN users u ON t.userId = u.id\n" +
+                "WHERE u.id = ?\n" +
+                "AND isCompleted";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            ResultSet resultSet = pstmt.executeQuery();
+            if (!resultSet.isBeforeFirst() ) {
+                System.out.println("No tasks found.");
+            }
+            while (resultSet.next()) {
+                Integer id = resultSet.getInt("id");
+                String title = resultSet.getString("title");
+                String description = resultSet.getString("todoDescription");
+                Date date = resultSet.getDate("dueDate");
+                Boolean isCompleted = resultSet.getBoolean("isCompleted");
+                tasks.add( new Task(id,title,description,date,isCompleted));
+            }
+        } catch (Exception e) {
+            System.out.print(e);
+        }
+        return tasks;
+    }
+
+    public static ArrayList<Task> viewIncompleteTasks(Connection conn, Integer userId) {
+        ArrayList<Task> tasks = new ArrayList<>();
+        String sql = "SELECT t.id, t.title, t.todoDescription, t.dueDate, t.isCompleted\n" +
+                "FROM tasks t\n" +
+                "JOIN users u ON t.userId = u.id\n" +
+                "WHERE u.id = ?\n" +
+                "AND NOT isCompleted";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            ResultSet resultSet = pstmt.executeQuery();
+            if (!resultSet.isBeforeFirst() ) {
+                System.out.println("No tasks found.");
+            }
+            while (resultSet.next()) {
+                Integer id = resultSet.getInt("id");
+                String title = resultSet.getString("title");
+                String description = resultSet.getString("todoDescription");
+                Date date = resultSet.getDate("dueDate");
+                Boolean isCompleted = resultSet.getBoolean("isCompleted");
+                tasks.add( new Task(id,title,description,date,isCompleted));
+            }
+        } catch (Exception e) {
+            System.out.print(e);
+        }
+        return tasks;
     }
 
     public static void completeTask(Connection conn, Integer userId, String taskNAme) {
@@ -318,6 +447,21 @@ public class DbFunctions {
         }
     }
 
+    public static Boolean checkTask(Connection conn, String taskName){
+        String sql = "SELECT id FROM tasks where title = ?";
+        try(PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, taskName);
+            ResultSet resultSet = pstmt.executeQuery();
+
+            if(resultSet.next()){
+                return true;
+            }
+        }catch (Exception e){
+            System.out.print(e);
+        }
+        return false;
+    }
+
     public static void createEvent(Connection conn, Integer userId, String title, String eventDescription, Date eventDate, String eventLocation) {
         String sql = "insert into events(userId,title,eventDescription, eventDate, eventLocation) "
                 + "VALUES(?,?,?,?,?)";
@@ -334,7 +478,8 @@ public class DbFunctions {
         }
     }
 
-    public static void viewEvents(Connection conn, Integer userId) {
+    public static ArrayList<Event> viewEvents(Connection conn, Integer userId) {
+        ArrayList<Event> events = new ArrayList<>();
         String sql = "SELECT e.id, e.title, e.eventDescription, e.eventDate, e.eventLocation\n" +
                 "FROM events e\n" +
                 "JOIN users u ON e.userId = u.id\n" +
@@ -342,17 +487,21 @@ public class DbFunctions {
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             ResultSet resultSet = pstmt.executeQuery();
+            if (!resultSet.isBeforeFirst() ) {
+                System.out.println("No events found.");
+            }
             while (resultSet.next()) {
-                String taskInfo = "EVENT ID: " + resultSet.getInt("id") +
-                        " NAME: " + resultSet.getString("title") +
-                        " DESCRIPTION: " + resultSet.getString("eventDescription") +
-                        " EVENT DATE: " + resultSet.getDate("eventDate") +
-                        " EVENT LOCATION: " + resultSet.getString("eventLocation") ;
-                System.out.println(taskInfo);
+                Integer id = resultSet.getInt("id");
+                String title = resultSet.getString("title");
+                String description = resultSet.getString("eventDescription");
+                Date date = resultSet.getDate("eventDate");
+                String location = resultSet.getString("eventLocation") ;
+                events.add(new Event(id,title,description,date,location));
             }
         } catch (Exception e) {
             System.out.print(e);
         }
+        return events;
     }
 
     public static void deleteEvent(Connection conn, String eventName, Integer userId){
@@ -368,4 +517,20 @@ public class DbFunctions {
             System.out.print(e);
         }
     }
+
+    public static Boolean checkEvent(Connection conn, String eventName){
+        String sql = "SELECT id FROM events where title = ?";
+        try(PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, eventName);
+            ResultSet resultSet = pstmt.executeQuery();
+
+            if(resultSet.next()){
+                return true;
+            }
+        }catch (Exception e){
+            System.out.print(e);
+        }
+        return false;
+    }
+
 }

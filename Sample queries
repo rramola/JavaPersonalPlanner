@@ -18,19 +18,13 @@ FROM tasks t
 JOIN users u ON t.userId = u.id
 WHERE u.id = userId
 
-
-
-
-
 Query 4: Retrieve all unpaid bills for a specific user by id
-
 SELECT b.id, b.title, b.amount, b.dueDate
 FROM bills b
 JOIN users u ON b.userId = u.id
 WHERE u.id = userId AND b.isPaid = FALSE;
 
 Query 5: Retrieve all completed to-do items for a specific user by id
-
 SELECT ti.id, ti.title, ti.todoDescription
 FROM todo_items ti
 JOIN users u ON ti.userId = u.id

@@ -1,3 +1,4 @@
+import java.lang.annotation.Documented;
 import java.util.Date;
 
 public class Bill {
@@ -37,6 +38,7 @@ public class Bill {
         this.isPaid = isPaid;
     }
 
+    @Override
     public String toString() {
         String status = "Unpaid";
         if (isPaid) {

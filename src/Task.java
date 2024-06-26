@@ -5,15 +5,15 @@ import java.util.Date;
 public class Task {
     private Integer userId;
     private String title;
-    private String description;
-    private Date date;
+    private String todoDescription;
+    private Date dueDate;
     private Boolean isCompleted;
 
-    public Task(Integer userId, String title, String description, Date date, Boolean isCompleted){
+    public Task(Integer userId, String title, String todoDescription, Date dueDate, Boolean isCompleted){
         this.userId = userId;
         this.title = title;
-        this.description = description;
-        this.date = date;
+        this.todoDescription = todoDescription;
+        this.dueDate = dueDate;
         this.isCompleted = isCompleted;
     }
 
@@ -25,12 +25,12 @@ public class Task {
         return title;
     }
 
-    public String getDescription(){
-        return description;
+    public String todoDescription(){
+        return todoDescription;
     }
 
-    public Date getDate(){
-        return date;
+    public Date getDueDate(){
+        return dueDate;
     }
 
     public Boolean getIsCompleted(){
@@ -39,5 +39,15 @@ public class Task {
 
     public void setIsCompleted(Boolean isCompleted) {
         this.isCompleted = isCompleted;
+    }
+
+    @Override
+    public String toString() {
+        String status = "Incomplete";
+        if (isCompleted) {
+            status = "Completed";
+        } ;
+        return "NAME: " + title + ", DESCRIPTION: " + todoDescription +
+                ", DATE: " + dueDate + ", STATUS: " + status;
     }
 }

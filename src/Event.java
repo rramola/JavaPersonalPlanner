@@ -1,14 +1,15 @@
 import com.sun.source.tree.BreakTree;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 public class Event {
     private Integer userId;
     private String title;
     private String eventDescription;
-    private Timestamp eventDate;
+    private Date eventDate;
     private String eventLocation;
-    public Event(Integer userId, String title, String eventDescription, Timestamp eventDate, String eventLocation) {
+    public Event(Integer userId, String title, String eventDescription, Date eventDate, String eventLocation) {
         this.userId = userId;
         this.title = title;
         this.eventDescription = eventDescription;
@@ -25,10 +26,16 @@ public class Event {
     public String getEventDescription(){
         return eventDescription;
     }
-    public Timestamp getEventDate() {
+    public Date getEventDate() {
         return eventDate;
     }
     public String getEventLocation(){
         return eventLocation;
+    }
+
+    @Override
+    public String toString() {
+        return "NAME: " + title + ", DESCRIPTION: " + eventDescription +
+                ", DATE: " + eventDate + ", LOCATION: " + eventLocation;
     }
 }
