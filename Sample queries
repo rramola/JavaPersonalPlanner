@@ -4,15 +4,13 @@ FROM bills b
 JOIN users u ON b.userId = u.id
 WHERE u.id = userId
 
-
 Query 2: Retrieve all  calendar events for a specific user by id
 SELECT e.id, e.title, e.eventDescription, e.eventDate, e.eventLocation
 FROM events e
 JOIN users u ON e.userId = u.id
 WHERE u.id = userId
 
-
-Query 3: Retrieve all to-do items for a specific user by id
+Query 3: Retrieve all tasks items for a specific user by id
 SELECT t.id, t.title, t.todoDescription, t.isCompleted
 FROM tasks t
 JOIN users u ON t.userId = u.id
@@ -24,8 +22,8 @@ FROM bills b
 JOIN users u ON b.userId = u.id
 WHERE u.id = userId AND b.isPaid = FALSE;
 
-Query 5: Retrieve all completed to-do items for a specific user by id
-SELECT ti.id, ti.title, ti.todoDescription
-FROM todo_items ti
-JOIN users u ON ti.userId = u.id
-WHERE u.id = userId AND ti.isCompleted = TRUE;
+Query 5: Retrieve all completed tasks items for a specific user by id
+SELECT t.id, t.title, t.todoDescription
+FROM tasks t
+JOIN users u ON t.userId = u.id
+WHERE u.id = userId AND t.isCompleted = TRUE;

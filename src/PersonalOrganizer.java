@@ -6,6 +6,9 @@ import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 public class PersonalOrganizer {
+    static Boolean loggedIn = false;
+    static Boolean loggingIn = true;
+    static Boolean running = true;
     public static void main(String[] args) throws SQLException {
         Scanner input = new Scanner(System.in);
         try {
@@ -23,10 +26,9 @@ public class PersonalOrganizer {
 //        db.createTasksTable(conn, "tasks");
 //        db.createEventsTable(conn, "events");
 
-        Boolean running = true;
 
         while (running) {
-            System.out.print("Please select a menu option. [1]Bills, [2]Tasks, [3]Events, [4]Logout > ");
+            System.out.print("Please select a menu option. [1]Bills, [2]Tasks, [3]Events, [4]Quit > ");
             String mainMenuSelection = input.nextLine();
 
             //Bills menu
@@ -154,9 +156,7 @@ public class PersonalOrganizer {
 
     //////////////////////////USER METHODS////////////////////////////
     public static void login(Scanner input) throws SQLException {
-        Boolean running = true;
-        Boolean loggedIn = false;
-        while (running) {
+        while (loggingIn) {
             System.out.print("Do you already have an account? [Y]es or [N]o [Q]uit > ");
             String userAccountCreation = input.nextLine();
             if (userAccountCreation.toLowerCase().equals("y")) {
@@ -170,6 +170,7 @@ public class PersonalOrganizer {
                     Integer currentUserId = DbFunctions.loginUser(conn, username, password);
                     if (currentUserId != null) {
                         loggedIn = true;
+                        loggingIn = false;
                         System.out.println(currentUserId);
                         run(input, currentUserId);
                     } else {
@@ -241,8 +242,17 @@ public class PersonalOrganizer {
                     }
 
                     while (!loggedIn) {
-                        System.out.print("Please enter a password > ");
-                        String passwordOne = input.nextLine();
+                        String passwordOne = null;
+
+                        while (passwordOne == null){
+                            System.out.print("Please enter a password > ");
+                            String passwordOneCheck = input.nextLine();
+                            if (passwordOneCheck.isEmpty()){
+                                System.out.println("Please enter a valid password");
+                            }else{
+                                passwordOne = passwordOneCheck;
+                            }
+                        }
                         System.out.print("Please confirm password > ");
                         String passwordTwo = input.nextLine();
                         if (passwordOne.equals(passwordTwo)) {
@@ -257,7 +267,7 @@ public class PersonalOrganizer {
                     }
                 }
             } else if (userAccountCreation.toLowerCase().equals("q")) {
-                running = false;
+                loggingIn = false;
             } else {
                 System.out.println("Invalid Selection.");
             }
