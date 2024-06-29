@@ -29,19 +29,19 @@ public class PersonalOrganizer {
 
         while (running) {
             System.out.print("Please select a menu option. [1]Bills, [2]Tasks, [3]Events, [4]Quit > ");
-            String mainMenuSelection = input.nextLine();
+            String mainMenuSelection = input.next();
 
             //Bills menu
             if (mainMenuSelection.equals("1")) {
                 Boolean billsMenuRunning = true;
                 while (billsMenuRunning) {
                     System.out.print("Would you like to [1]Create, [2]View, [3]Pay, [4]Delete, or [5]Quit > ");
-                    String billMenuSelection = input.nextLine();
+                    String billMenuSelection = input.next();
                     if (billMenuSelection.equals("1")) {
                         createBill(input, currentUserId);
                     } else if (billMenuSelection.equals("2")) {
                         System.out.print("Would you like to view [1]All, [2]Paid, or [3]Unpaid > ");
-                        String viewBillSelection = input.nextLine();
+                        String viewBillSelection = input.next();
                         if (viewBillSelection.equals("1")) {
                             viewBills(currentUserId);
                         }else if (viewBillSelection.equals("2")){
@@ -53,7 +53,7 @@ public class PersonalOrganizer {
                         }
                     } else if (billMenuSelection.equals("3")) {
                         System.out.print("Which bill would you like to pay? ");
-                        String payBillName = input.nextLine();
+                        String payBillName = input.next();
                         Boolean checkBill = checkBillName(payBillName);
                         if (checkBill) {
                             payBills(payBillName, currentUserId);
@@ -62,7 +62,7 @@ public class PersonalOrganizer {
                         }
                     } else if (billMenuSelection.equals("4")) {
                         System.out.print("Which bill would you like to delete? ");
-                        String deleteBillName = input.nextLine();
+                        String deleteBillName = input.next();
                         Boolean checkBill = checkBillName(deleteBillName);
                         if (checkBill) {
                             deleteBills(deleteBillName, currentUserId);
@@ -81,12 +81,12 @@ public class PersonalOrganizer {
                 boolean taskMenu = true;
                 while (taskMenu) {
                     System.out.print("Would you like to [1]Create, [2]View, [3]Complete, [4]Delete, [5]Quit > ");
-                    String taskMenuSelection = input.nextLine();
+                    String taskMenuSelection = input.next();
                     if (taskMenuSelection.equals("1")) {
                         createTask(input, currentUserId);
                     } else if (taskMenuSelection.equals("2")) {
                         System.out.print("Would you like to view [1]All, [2]Complete, or [3]Incomplete > ");
-                        String viewTasksSelection = input.nextLine();
+                        String viewTasksSelection = input.next();
                         if (viewTasksSelection.equals("1")) {
                             viewTasks(currentUserId);
                         }else if (viewTasksSelection.equals("2")){
@@ -98,7 +98,7 @@ public class PersonalOrganizer {
                         }
                     } else if (taskMenuSelection.equals("3")) {
                         System.out.print("Please enter the task you would like to mark complete > ");
-                        String taskName = input.nextLine();
+                        String taskName = input.next();
                         Boolean checkTask = checkTaskName(taskName);
                         if (checkTask) {
                             completeTask(currentUserId, taskName);
@@ -107,7 +107,7 @@ public class PersonalOrganizer {
                         }
                     } else if (taskMenuSelection.equals("4")) {
                         System.out.print("Please enter the name of the task you would like to delete > ");
-                        String taskName = input.nextLine();
+                        String taskName = input.next();
                         Boolean checkTask = checkTaskName(taskName);
                         if (checkTask) {
                             deleteTask(currentUserId, taskName);
@@ -126,14 +126,14 @@ public class PersonalOrganizer {
                 boolean eventMenu = true;
                 while (eventMenu) {
                     System.out.println("Would you like to [1]Add, [2]View,[3]Delete, [4]Quit > ");
-                    String eventMenuSelection = input.nextLine();
+                    String eventMenuSelection = input.next();
                     if (eventMenuSelection.equals("1")) {
                         createEvent(input, currentUserId);
                     } else if (eventMenuSelection.equals("2")) {
                         viewEvents(currentUserId);
                     } else if (eventMenuSelection.equals("3")) {
                         System.out.print("Please enter the name of the event you would like to delete > ");
-                        String eventName = input.nextLine();
+                        String eventName = input.next();
                         Boolean checkEvent = checkEventName(eventName);
                         if (checkEvent) {
                             deleteEvent(currentUserId, eventName);
@@ -158,15 +158,15 @@ public class PersonalOrganizer {
     public static void login(Scanner input) throws SQLException {
         while (loggingIn) {
             System.out.print("Do you already have an account? [Y]es or [N]o [Q]uit > ");
-            String userAccountCreation = input.nextLine();
+            String userAccountCreation = input.next();
             if (userAccountCreation.toLowerCase().equals("y")) {
                 while (!loggedIn) {
                     DbFunctions db = new DbFunctions();
                     Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
                     System.out.print("Please enter your username > ");
-                    String username = input.nextLine();
+                    String username = input.next();
                     System.out.print("Please enter your password > ");
-                    String password = input.nextLine();
+                    String password = input.next();
                     Integer currentUserId = DbFunctions.loginUser(conn, username, password);
                     if (currentUserId != null) {
                         loggedIn = true;
@@ -186,7 +186,7 @@ public class PersonalOrganizer {
                     String email = "";
                     while (!addEmail) {
                         System.out.print("Please enter your email > ");
-                        email = input.nextLine();
+                        email = input.next();
                         if (email.isEmpty()) {
                             System.out.println("Invalid entry.");
                         } else {
@@ -203,7 +203,7 @@ public class PersonalOrganizer {
                     String firstName = "";
                     while (!addFirstName) {
                         System.out.print("Please enter your first name > ");
-                        firstName = input.nextLine();
+                        firstName = input.next();
                         if (firstName.isEmpty()) {
                             System.out.println("Invalid entry.");
                         } else {
@@ -215,7 +215,7 @@ public class PersonalOrganizer {
                     String lastName = "";
                     while (!addLastName) {
                         System.out.print("Please enter your last name > ");
-                        lastName = input.nextLine();
+                        lastName = input.next();
                         if (lastName.isEmpty()) {
                             System.out.println("Invalid entry.");
                         } else {
@@ -227,7 +227,7 @@ public class PersonalOrganizer {
                     String username = "";
                     while (!createUsername) {
                         System.out.print("Please enter a username > ");
-                        username = input.nextLine();
+                        username = input.next();
                         if (username.isEmpty()) {
                             System.out.println("Invalid entry");
                         } else {
@@ -246,7 +246,7 @@ public class PersonalOrganizer {
 
                         while (passwordOne == null){
                             System.out.print("Please enter a password > ");
-                            String passwordOneCheck = input.nextLine();
+                            String passwordOneCheck = input.next();
                             if (passwordOneCheck.isEmpty()){
                                 System.out.println("Please enter a valid password");
                             }else{
@@ -254,7 +254,7 @@ public class PersonalOrganizer {
                             }
                         }
                         System.out.print("Please confirm password > ");
-                        String passwordTwo = input.nextLine();
+                        String passwordTwo = input.next();
                         if (passwordOne.equals(passwordTwo)) {
                             loggedIn = true;
                             DbFunctions.createUser(conn, email, firstName, lastName, username, passwordOne);
@@ -279,9 +279,18 @@ public class PersonalOrganizer {
         DbFunctions db = new DbFunctions();
         Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
         Boolean validNumber = false;
+        Boolean validName = false;
         Double newBillAmount = 0.0;
-        System.out.print("Enter a name for the bill > ");
-        String newBillName = input.nextLine();
+        String newBillName = null;
+        while (!validName) {
+            System.out.print("Enter a name for the bill > ");
+            newBillName = input.next();
+            if (!newBillName.isEmpty()){
+                validName = true;
+            }else{
+                System.out.println("Please enter a valid name.");
+            }
+        }
         while (!validNumber) {
             System.out.print("Enter the amount due for this bill > ");
             if (input.hasNextDouble()) {
@@ -350,10 +359,19 @@ public class PersonalOrganizer {
     public static void createTask(Scanner input, Integer currentUserId) {
         DbFunctions db = new DbFunctions();
         Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
-        System.out.print("Enter a name for the task you would like to add > ");
-        String newTaskName = input.nextLine();
+        Boolean validName = false;
+        String newTaskName = null;
+        while (!validName) {
+            System.out.print("Enter a name for the task you would like to add > ");
+            newTaskName = input.next();
+            if (!newTaskName.isEmpty()){
+                validName = true;
+            }else{
+                System.out.println("Please enter a valid name.");
+            }
+        }
         System.out.print("Enter a description for the task you would like to add > ");
-        String newTaskDescription = input.nextLine();
+        String newTaskDescription = input.next();
         Date confirmDate = dateCheck(input,"Enter the date the task is due (yyyy-MM-dd) >");
         DbFunctions.createTask(conn, currentUserId, newTaskName, newTaskDescription, confirmDate, false);
     }
@@ -410,13 +428,22 @@ public class PersonalOrganizer {
     public static void createEvent(Scanner input, Integer currentUserId) {
         DbFunctions db = new DbFunctions();
         Connection conn = db.connectToDb("personalorganizer", "postgres", "admin");
-        System.out.print("What is the name of the event you want to add? ");
-        String newEventName = input.nextLine();
+        Boolean validName = false;
+        String newEventName = null;
+        while (!validName) {
+            System.out.print("What is the name of the event you want to add? ");
+            newEventName = input.next();
+            if (!newEventName.isEmpty()){
+                validName = true;
+            }else{
+                System.out.println("Please enter a valid name.");
+            }
+        }
         System.out.print("Please enter a description for this event.> ");
-        String newEventDescription = input.nextLine();
+        String newEventDescription = input.next();
         Date confirmDate = dateCheck(input, "Enter the new bill due date (yyyy-MM-dd) >");
         System.out.print("Please enter a location for this event.> ");
-        String newEventLocation = input.nextLine();
+        String newEventLocation = input.next();
         DbFunctions.createEvent(conn, currentUserId,newEventName, newEventDescription, confirmDate, newEventLocation);
     }
 
